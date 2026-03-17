@@ -1,0 +1,32 @@
+@startuml "Cliente"
+
+left to right direction
+
+actor "Cliente" as cliente
+
+rectangle "MCU01 - Clientes" {
+
+usecase "Visualizar Treino" as vizualizarTreino
+usecase "Consultar Carga" as consultarCarga
+usecase "Visualizar Perfil" as visualizarPerfil
+usecase "Consultar Avaliação física" as consultarAvaliacaoFisica
+usecase "Agendar Avaliação física" as agendarAvaliacao
+usecase "Realizar Pagamento" as realizarPagamento
+usecase "Escolher Plano" as escolherPlano
+usecase "Visualizar Notificações" as visualizarNotificacoes
+
+}
+
+cliente -- vizualizarTreino
+vizualizarTreino <.. consultarCarga: <<extend>>
+cliente -- visualizarPerfil
+cliente -- consultarAvaliacaoFisica
+
+consultarAvaliacaoFisica <.. agendarAvaliacao: <<extend>>
+
+cliente -- realizarPagamento
+realizarPagamento ..> escolherPlano: <<include>>
+cliente -- visualizarNotificacoes
+
+
+@enduml

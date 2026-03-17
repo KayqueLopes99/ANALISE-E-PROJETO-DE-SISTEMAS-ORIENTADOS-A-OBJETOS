@@ -1,0 +1,45 @@
+@startuml "Instructor"
+
+left to right direction
+
+actor "Instrutor" as instrutor
+
+rectangle "MCU02 -Instrutor" {
+
+usecase "Visualizar Perfil" as visualizarPerfil
+
+usecase "Cadastrar Treino" as cadastrarTreinos
+usecase "Remover Treino" as removerTreinos
+usecase "Atualizar Treino" as atualizarTreinos
+usecase "Consultar Treino" as consultarTreinos
+
+usecase "Cadastrar Carga de Treino" as cadastrarCargaTreino
+usecase "Remover Carga de Treino" as removerCargaTreino
+usecase "Atualizar Carga de Treino" as atualizarCargaTreino
+usecase "Consultar Carga de Treino" as ConsultarCargaTreino
+
+usecase "Consultar Clientes" as consultarClientes
+usecase "Confirmar solicitação" as comfirmarSolicitacao
+usecase "Visualizar Notificações" as visualizarNotificacoes
+
+
+}
+
+instrutor --> visualizarPerfil
+
+instrutor --> cadastrarTreinos
+consultarTreinos <.. removerTreinos: <<extend>>
+consultarTreinos <.. atualizarTreinos: <<extend>>
+instrutor --> consultarTreinos
+
+instrutor --> cadastrarCargaTreino
+ConsultarCargaTreino <.. removerCargaTreino: <<extend>>
+ConsultarCargaTreino <.. atualizarCargaTreino: <<extend>>
+instrutor --> ConsultarCargaTreino
+
+instrutor --> consultarClientes
+instrutor --> comfirmarSolicitacao
+instrutor --> visualizarNotificacoes
+
+
+@enduml

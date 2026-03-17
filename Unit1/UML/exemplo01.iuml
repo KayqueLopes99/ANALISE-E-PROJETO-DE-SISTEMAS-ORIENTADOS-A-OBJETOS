@@ -1,0 +1,21 @@
+@startuml Case
+
+left to right direction
+
+actor Usuario
+actor Admin
+
+rectangle "Sistema" {
+
+(Cadastrar cliente) as UC1
+(Realizar login) as UC2
+(Gerenciar usuarios) as UC3
+
+}
+
+Usuario --> UC1
+Usuario --> UC2
+Admin --> UC2
+Admin --> UC3
+
+@enduml
