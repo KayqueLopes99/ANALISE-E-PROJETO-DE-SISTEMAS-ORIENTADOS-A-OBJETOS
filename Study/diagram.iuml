@@ -1,0 +1,161 @@
+@startuml diagrama
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 100
+
+abstract class Usuario {
+  - id: int
+  - nome: String
+  - email: String
+  - telefone: String
+  + realizarLogin(): Boolean
+}
+
+class Administrador {
+  - senha: String
+  + gerenciarSistema(): void
+  + gerarRelatorios(): void
+}
+
+class Motorista {
+  - horario_motorista: String
+  - rota_motorista: String
+  - cnh_motorista: String
+  + acessarEntregas(): List<Entrega>
+}
+
+Usuario <|-- Administrador
+Usuario <|-- Motorista
+
+
+class Empresa {
+  - id_empresa: int
+  - cnpj: String
+  - nome_fantasia: String
+  - telefone: String
+  - email: String
+  + cadastrarArmazem(): void
+  + consultarEstoque(): void
+}
+
+class Destinatario {
+  - id_destinatario: int
+  - nome: String
+  - cpf: String
+  - telefone: String
+  - email: String
+  - endereco: String
+}
+
+
+class Armazem {
+  - id_armazem: int
+  - nome: String
+  - cep: String
+  - logradouro: String
+  - id_empresa: int
+  + transferirProduto(destino: Armazem, produto: Produto): void
+}
+
+class Produto {
+  - sku: String
+  - nome: String
+  - preco: Double
+  - descricao: String
+  - peso: Double
+  - altura: Double
+  - largura: Double
+  - categoria: String
+  - id_empresa: int
+}
+
+class Estoque {
+  - id_estoque: int
+  - sku_produto: String
+  - id_armazem: int
+  - quantidade_disponivel: Integer
+  - quantidade_minima: Integer
+  - quantidade_maxima: Integer
+  - data_ultima_atualizacao: Date
+  + registrarEntrada(qtd: Integer): void
+  + registrarSaida(qtd: Integer): void
+  + verificarDisponibilidade(qtd: Integer): Boolean
+}
+
+class MovimentacaoEstoque {
+  - id_movimentacao: int
+  - id_estoque: int
+  - tipo_movimentacao: String
+  - quantidade: Integer
+  - data: Date
+}
+
+class Pedido {
+  - id_pedido: int
+  - id_empresa: int
+  - id_destinatario: int
+  - data_pedido: Date
+  - valor_total: Double
+  - status_pedido: String
+  + calcularTotal(): Double
+  + validarEstoque(): Boolean
+  + podeCancelar(): Boolean
+  + cancelarPedido(): Boolean
+  + separarItens(): void
+  + gerarEntrega(): Entrega
+}
+
+class ItemPedido {
+  - id_item: int
+  - id_pedido: int
+  - sku_produto: String
+  - quantidade: Integer
+  - preco_unitario: Double
+  - valor_subtotal: Double
+  + calcularSubtotal(): Double
+}
+
+class Entrega {
+  - id_entrega: int
+  - id_pedido: int
+  - id_transporte: int
+  - id_motorista: int
+  - data_envio: Date
+  - data_prevista: Date
+  - status_entrega: String
+  - local: String
+  - codigo_rastreio: String
+  + gerarCodigoRastreio(): String
+  + registrarSaidaParaTransporte(): void
+  + atualizarStatus(novoStatus: String): void
+}
+
+class Transporte {
+  - id_transporte: int
+  - tipo_veiculo: String
+  - capacidade_carga_maxima: Double
+  - custo_frete: Double
+  - nome_transportadora: String
+}
+
+
+Empresa "1" -right-> "*" Pedido : realiza >
+Pedido "1" -right-> "1" Destinatario : destino >
+
+Pedido "1" -down-> "*" ItemPedido : contem >
+ItemPedido "*" -right-> "1" Produto : compoe >
+
+Pedido "1" -down-> "1" Entrega : gera >
+Entrega "*" -right-> "1" Transporte : alocada em >
+Transporte "1" -up-> "1" Motorista : conduzido por >
+
+Empresa "1" -down-> "*" Armazem : possui >
+Empresa "1" -right-> "*" Produto : cadastra >
+
+Armazem "1" -right-> "*" Estoque : armazena >
+Produto "1" -down-> "*" Estoque : mantido em >
+
+Estoque "1" -right-> "*" MovimentacaoEstoque : movimenta >
+
+@enduml

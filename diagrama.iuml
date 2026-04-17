@@ -1,0 +1,143 @@
+@startuml DiagramaDeClasses
+skinparam classAttributeIconSize 0
+skinparam monochrome true
+skinparam linetype ortho
+skinparam nodesep 80
+skinparam ranksep 80
+
+' --- Enums (Definições de Tipos) ---
+enum TipoUsuario {
+  LEITOR
+  BIBLIOTECARIO
+}
+
+enum StatusLeitor {
+  ATIVO
+  SUSPENSO
+}
+
+enum StatusExemplar {
+  DISPONIVEL
+  EMPRESTADO
+  RESERVADO
+  MANUTENCAO
+}
+
+enum StatusReserva {
+  PENDENTE
+  ATENDIDA
+  EXPIRADA
+  CANCELADA
+}
+
+' --- Classes de Usuário (Herança) ---
+abstract class Usuario {
+  - idUsuario: int
+  - nome: String
+  - email: String
+  - login: String
+  - senha: String
+  - tipoUsuario: TipoUsuario
+}
+
+class Leitor {
+  - cpf: String
+  - matricula: String
+  - statusLeitor: StatusLeitor
+  - dataCadastro: Date
+  - dataFimSuspensao: Date
+}
+
+class Bibliotecario {
+  - registroFuncional: String
+}
+
+' --- Classes do Acervo ---
+class Obra {
+  - idObra: int
+  - titulo: String
+  - autor: String
+  - isbn: String
+  - editora: String
+  - anoPublicacao: int
+  - edicao: String
+  - idioma: String
+  - sinopse: String
+  - urlCapa: String
+  - paginas: int
+  - categorias: List<Categoria>
+}
+
+class Categoria {
+  - idCategoria: int
+  - nome: String
+}
+
+class Exemplar {
+  - idExemplar: int
+  - codigoBarras: String
+  - status: StatusExemplar
+  - estadoConservacao: String
+  - obra: Obra
+  - localizacao: Localizacao
+}
+
+class Localizacao {
+  - idLocalizacao: int
+  - sala: String
+  - estante: String
+  - sessao: String
+  - descricao: String
+}
+
+' --- Classes Transacionais ---
+class Emprestimo {
+  - idEmprestimo: int
+  - dataEmprestimo: Date
+  - dataDevolucaoPrevista: Date
+  - dataDevolucaoReal: Date
+  - quantidadeRenovacoes: int
+  - diasSuspensao: int
+  - leitor: Leitor
+  - exemplar: Exemplar
+}
+
+class Reserva {
+  - idReserva: int
+  - dataReserva: Date
+  - statusReserva: StatusReserva
+  - leitor: Leitor
+  - obra: Obra
+}
+
+class Avaliacao {
+  - idAvaliacao: int
+  - nota: int
+  - comentario: String
+  - dataAvaliacao: Date
+  - leitor: Leitor
+  - obra: Obra
+}
+
+' --- Relacionamentos de Herança ---
+Usuario <|-down- Leitor
+Usuario <|-down- Bibliotecario
+
+' --- Relacionamentos do Acervo ---
+Obra " * " -right-> " * " Categoria : pertence a >
+Obra " 1 " *-down-> " 1..* " Exemplar : possui >
+
+' Relacionamento de Agregação: O Exemplar está na Localização, mas pode sair dela
+Localizacao " 1 " o-- " 0..* " Exemplar : < fica em
+
+' --- Relacionamentos de Operações ---
+Leitor " 1 " -down-> " 0..5 " Emprestimo : realiza >
+Exemplar " 1 " <-left- " 0..* " Emprestimo : < referente a
+
+Leitor " 1 " -right-> " 0..3 " Reserva : solicita >
+Obra " 1 " <-left- " 0..* " Reserva : < referente a
+
+Leitor " 1 " -up-> " 0..* " Avaliacao : escreve >
+Obra " 1 " <-up- " 0..* " Avaliacao : < recebe
+
+@enduml

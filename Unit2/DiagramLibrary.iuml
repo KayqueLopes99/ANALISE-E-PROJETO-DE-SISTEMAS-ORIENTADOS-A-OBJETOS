@@ -1,0 +1,69 @@
+@startuml
+autonumber
+
+actor "Aluno" as Aluno
+participant "Interface (UI)" as UI
+participant "Emprestimo" as GE
+participant "Acervo" as Acervo
+participant "Livro" as Livro
+database "Banco de Dados" as DB
+
+Aluno -> UI: Solicita empréstimo (ID do Livro)
+activate UI
+
+UI -> GE: iniciarEmprestimo(alunoId, livroId)
+activate GE
+
+== Fase 1: Validação do Aluno ==
+GE -> DB: checarSituacaoAluno(alunoId)
+activate DB
+DB --> GE: Retorna (Sem pendências)
+deactivate DB
+
+== Fase 2: Consulta ao Acervo ==
+GE -> Acervo: verificarDisponibilidade(livroId)
+activate Acervo
+
+Acervo -> DB: buscarEstoque(livroId)
+activate DB
+DB --> Acervo: Retorna (Qtd = 1, Status = Disponível)
+deactivate DB
+
+alt Livro Disponível no Acervo
+    == Fase 3: Efetivação ==
+    
+    ' O <<create>> entra aqui!
+    Acervo -> Livro **: <<create>> instanciar(livroId)
+    activate Livro
+    
+    Acervo -> Livro: setStatus("EMPRESTADO")
+    Livro --> Acervo: Status atualizado
+    
+    Acervo -> DB: atualizarEstoque(livroId, -1)
+    activate DB
+    DB --> Acervo: OK
+    deactivate DB
+    
+    deactivate Livro
+    
+    Acervo --> GE: Retorna (Livro liberado para empréstimo)
+    
+    GE -> DB: gerarRegistroEmprestimo(alunoId, livroId, dataDevolucao)
+    activate DB
+    DB --> GE: OK
+    deactivate DB
+    
+    GE --> UI: Sucesso (Empréstimo registrado)
+    UI --> Aluno: Emite comprovante e data de devolução
+    
+else Livro Indisponível
+    Acervo --> GE: Retorna Erro (Acervo esgotado)
+    GE --> UI: Falha na solicitação
+    UI --> Aluno: Exibe aviso: "Livro esgotado no acervo no momento"
+end
+
+deactivate Acervo
+deactivate GE
+deactivate UI
+
+@enduml

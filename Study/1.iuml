@@ -1,0 +1,84 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+' --- Camada de Usuários ---
+abstract class Usuario {
+  - id: int
+  - nome: String
+  - email: String
+  - senha: String
+  + autenticar(): Boolean
+}
+
+class Cliente {
+  - matricula: String
+  - saldoRefeicoes: int
+  + consultarCardapio(): void
+  + avaliarRefeicao(nota: int): void
+}
+
+class Atendente {
+  - postoTrabalho: String
+  + validarAcesso(c: Cliente): Boolean
+  + registrarConsumo(c: Cliente): void
+}
+
+class Cozinheiro {
+  - especialidade: String
+  + visualizarOrdemProducao(): void
+  + registrarDesperdicio(qtd: double): void
+}
+
+' Adicionando a Nutricionista para fechar o ciclo do Caso de Uso
+class Nutricionista {
+  - crn: String
+  + elaborarCardapio(data: Date): void
+  + gerenciarEstoque(): void
+}
+
+Usuario <|-- Cliente
+Usuario <|-- Atendente
+Usuario <|-- Cozinheiro
+Usuario <|-- Nutricionista
+
+' --- Camada de Alimentos e Estoque ---
+class Alimento {
+  - idAlimento: int
+  - nome: String
+  - caloriasPorGrama: double
+  - quantidadeEstoque: double
+  - unidadeMedida: String
+}
+
+class TipoAlimento {
+  - idTipo: int
+  - descricao: String 
+}
+
+' --- Camada de Planejamento ---
+class Cardapio {
+  - idCardapio: int
+  - data: Date
+  - periodo: String 
+  + calcularTotalCalorico(): double
+}
+
+' --- Relacionamentos ---
+
+' Um Alimento tem um Tipo (ex: Frango é Proteína)
+Alimento "*" -- "1" TipoAlimento : classificado como >
+
+' O Cardápio é uma agregação de alimentos (Itens do Cardápio)
+Cardapio "1" o-- "*" Alimento : composto por >
+
+' Nutricionista gerencia os alimentos e elabora o cardápio
+Nutricionista "1" -- "*" Alimento : gerencia >
+Nutricionista "1" -- "*" Cardapio : elabora >
+
+' O Cliente consome o Cardápio (Associação de consumo)
+Cliente "*" -- "1" Cardapio : consome >
+
+' Cozinheiro produz o Cardápio baseado nos Alimentos
+Cozinheiro "1" -- "1" Cardapio : prepara >
+
+@enduml

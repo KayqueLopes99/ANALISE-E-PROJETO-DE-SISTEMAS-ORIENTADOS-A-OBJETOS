@@ -1,0 +1,50 @@
+@startuml pokemon diagrama
+autonumber
+actor "Treinador" as T
+participant "App Pokémon GO\n(Interface Cliente)" as App
+participant "Servidor GO\n(Backend API)" as Server
+database "Banco de Dados" as DB
+
+== Fase 1: Encontro ==
+T -> App: Clica no Pokémon no mapa (ex: Pidgey)
+activate App
+App -> Server: GET /api/encounter/pidgey_123
+activate Server
+Server -> DB: query: Obter estatísticas específicas (CP, moves) e Bioma
+activate DB
+DB --> Server: Retorna dados (Modelo 3D, Taxa de Captura Base, CP=150)
+deactivate DB
+Server --> App: Dados do encontro (Pronto para a captura)
+deactivate Server
+App --> T: Exibe tela de captura com o Pokémon
+deactivate App
+
+== Fase 2: Tentativa de Captura ==
+T -> App: Arremessa Pokébola (com bônus de bola curva)
+activate App
+
+note right of App: App calcula a "Qualidade do Lançamento"\n(Ex: Excelente, Ótimo, Bom) baseado na precisão
+
+App -> Server: POST /api/catch (pidgey_123, bola=normal, throw=excelente, curve=true)
+activate Server
+
+note over Server: O Servidor aplica a **Fórmula de Captura**:\n(BCR, Bola, Fruta, Medalhas, Bônus de Lançamento, Curva)
+
+Server -> DB: query: Gerar número aleatório e verificar contra a probabilidade calculada
+activate DB
+note right of DB: Se aleatório < probabilidade_calculada:\nSUCESSO!
+DB --> Server: Resultado: Sucesso (Pegou!)
+deactivate DB
+
+Server -> DB: insert: Adicionar Pidgey ao inventário do Treinador\n(e consome 1 Pokébola)
+activate DB
+DB --> Server: Ok
+deactivate DB
+
+Server --> App: Retorna Status 200 OK: { status: "Caught", pokemon: { id: "pidgey_123", cp: 150 } }
+deactivate Server
+
+App --> T: Animação de captura (três piscadas) e exibe tela de sucesso!
+deactivate App
+
+@enduml

@@ -1,0 +1,33 @@
+@startuml "Adminitrador"
+
+left to right direction
+
+actor "Atendente" as atendente
+actor "Gerente" as gerente
+
+rectangle "MCU03 - Adminitração" {
+
+usecase "Gerenciar Produtos" as gerenciarProdutos
+usecase "Gerenciar Estoque" as gerenciarEstoque
+usecase "Gerenciar Instrutores" as gerenciarInstrutores
+usecase "Gerenciar Atendentes" as gerenciarAtendentes
+usecase "Realizar Venda" as realizarVenda
+
+usecase "Gerar Relatório de vendas" as gerarRelatorioVendas
+usecase "Gerar Relatório de Caixa" as gerarRelatorioCaixa
+
+}
+gerente --|> atendente
+
+atendente --> gerenciarProdutos
+atendente --> gerenciarEstoque
+atendente --> realizarVenda
+
+gerente --> gerenciarInstrutores
+gerente --> gerenciarAtendentes
+
+atendente --> gerarRelatorioVendas
+gerente --> gerarRelatorioCaixa
+
+
+@enduml
